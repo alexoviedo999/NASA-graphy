@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Container, Panel } from 'muicss/react';
 import {
   Appbar,
   Input,
-  Button
+  Button,
+  Container,
+  Panel
 } from 'muicss/react';
 import PicResults from './picResults.js';
 
@@ -33,9 +34,9 @@ class App extends Component {
   handleSearchSubmit(e) {
     e.preventDefault();
     const { picRequest } = this.state;
+// debugger;
 
-    //api post
-    const fetchResult = fetch('https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&api_key=3cfc5214b8dce09b084ad6ba57799de2&user_id=24662369@N07&nojsoncallback=1&format=json&per_page=10&tags=' + picRequest.tag)
+    const fetchResult = fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=3cfc5214b8dce09b084ad6ba57799de2&user_id=24662369@N07&tags=' + picRequest.tags + '&per_page=12&sort=relevance&format=json&nojsoncallback=1')
       .then(function (response) {
           console.log('response', response);
           return response.json();
@@ -54,8 +55,12 @@ class App extends Component {
 
     return (
       <div>
+        <Appbar
+          style={{textAlign: 'center', fontSize: '30px', padding: '10px 0px', backgroundColor: 'black'}}
+          className="mui--appbar-height"
+            >NASA-Graphy
+        </Appbar>
         <Container style={{maxWidth: '600px', marginTop: '30px'}}>
-          <h3>NASA Photography</h3>
           <Panel>
             <div className="mui--text-center">
               <Input type="text"

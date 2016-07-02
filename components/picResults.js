@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Panel } from 'muicss/react';
-import { Button } from 'muicss/react';
+import { Container, Panel, Button, Row, Col } from 'muicss/react';
 
 let PicResults = (props) => {
     const {picResults} = props;
@@ -9,16 +8,19 @@ let PicResults = (props) => {
 
     return (
       <Container style={{marginTop: '30px'}}>
-        <Panel>
           <div className="mui--text-center">
-            <ul>{picResults.map((pic, i) => <li key={i}>
-              <Button variant="raised">View</Button>
-              <h5>{ pic.title }</h5>
-              <img src={ 'https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '.jpg'} />
-              </li>)}
-            </ul>
+            <Row style={{display: 'block'}}>{picResults.map((pic, i) => <Col lg="4" md="6" sm="12" xs="12" key={i} style={{height: '400px', marginBottem: '10px'}}>
+
+              <Panel style={{position: 'relative', height: '390px'}}>
+              <p>{ pic.title }</p>
+              <img style={{margin: '10px'}} src={ 'https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '_m' + '.jpg'} />
+              <div className="viewButton" style={{bottom: '10', width: '100%', height: '50px'}}>
+                <Button variant="raised">View</Button>
+              </div>
+              </Panel>
+              </Col>)}
+            </Row>
           </div>
-        </Panel>
       </Container>
     )};
 
