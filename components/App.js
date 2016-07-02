@@ -5,6 +5,7 @@ import {
   Input,
   Button
 } from 'muicss/react';
+import PicResults from './picResults.js';
 
 class App extends Component {
   constructor(props) {
@@ -29,7 +30,6 @@ class App extends Component {
     });
   }
 
-
   handleSearchSubmit(e) {
     e.preventDefault();
     const { picRequest } = this.state;
@@ -41,7 +41,8 @@ class App extends Component {
           return response.json();
       })
       .then((body) => {
-          console.log('success', body);
+          console.log('success', body.photos.photo);
+          this.setState({picResults:body.photos.photo})
       })
       .catch (function (error) {
         console.log('request failed', error);
@@ -49,7 +50,7 @@ class App extends Component {
   }
 
   render () {
-    const { picRequest } = this.state;
+    const { picRequest, picResults } = this.state;
 
     return (
       <div>
@@ -72,6 +73,7 @@ class App extends Component {
             </div>
           </Panel>
         </Container>
+        <PicResults picResults={picResults}/>
       </div>)
     }
   }
