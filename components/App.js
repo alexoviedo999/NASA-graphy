@@ -29,21 +29,52 @@ class App extends Component {
     });
   }
 
-  render() {
+
+  handleSearchSubmit(e) {
+    e.preventDefault();
     const { picRequest } = this.state;
-    let input;
+
+    //api post
+    const fetchResult = fetch('https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&api_key=3cfc5214b8dce09b084ad6ba57799de2&user_id=24662369@N07&nojsoncallback=1&format=json&per_page=10&tags=' + picRequest.tag)
+      .then(function (response) {
+          console.log('response', response);
+          return response.json();
+      })
+      .then((body) => {
+          console.log('success', body);
+      })
+      .catch (function (error) {
+        console.log('request failed', error);
+      });
+  }
+
+  render () {
+    const { picRequest } = this.state;
 
     return (
       <div>
         <Container style={{maxWidth: '600px', marginTop: '30px'}}>
+          <h3>NASA Photography</h3>
           <Panel>
-            <h3>NASA Photography</h3>
+            <div className="mui--text-center">
+              <Input type="text"
+                label='Search NASA Pics by "tag"'
+                floatingLabel={true}
+                required={true}
+                value={picRequest.tag}
+                onChange={(e) => this.handleUpdate(e.target.value)}
+                />
+              <Button
+                variant="raised"
+                type="submit"
+                onClick={e => this.handleSearchSubmit(e)}>Send
+              </Button>
+            </div>
           </Panel>
         </Container>
-      </div>
-    );
+      </div>)
+    }
   }
-}
 
 
 export
