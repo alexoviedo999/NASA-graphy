@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import {
   Appbar,
   Input,
@@ -6,7 +7,11 @@ import {
   Container,
   Panel
 } from 'muicss/react';
-import PicResults from './picResults.js';
+import Tabs from 'muicss/lib/react/tabs';
+import Tab from 'muicss/lib/react/tab';
+import PicResults from './picResults';
+import PicView from './PicView';
+import { browserHistory } from 'react-router';
 
 class App extends Component {
   constructor(props) {
@@ -16,12 +21,19 @@ class App extends Component {
       picRequest: {
           tags: ''
       },
-      picResults: []
+      picResults: [],
+      picView: {
+        pic: '',
+        selectedTab: 0
+      },
+      selectedTab: 0
     }
     this.handleUpdate = this.handleUpdate.bind(this);
+    this.handlePicView = this.handlePicView.bind(this);
+    this.onTabChange = this.onTabChange.bind(this);
   }
 
-  handleUpdate(value) {
+  handleUpdate (value) {
     //set student state
     this.setState({
       picRequest: {
@@ -31,7 +43,31 @@ class App extends Component {
     });
   }
 
-  handleSearchSubmit(e) {
+  onTabChange (i, value, tab, ev) {
+    console.log('tabs', arguments);
+// debugger;
+    console.log('select', this.state.picView.selectedTab);
+    this.setState({
+      picView: {
+        ...this.state.picView,
+        selectedTab: 1
+      }
+    });
+  }
+
+  handlePicView (pic) {
+    // debugger;
+    console.log('picView', pic);
+    this.setState({
+      picView: {
+        ...this.state.picView,
+        pic: pic,
+        selectedTab: 1
+      }
+    });
+  }
+
+  handleSearchSubmit (e) {
     e.preventDefault();
     const { picRequest } = this.state;
 // debugger;
@@ -43,43 +79,60 @@ class App extends Component {
       })
       .then((body) => {
           console.log('success', body.photos.photo);
-          this.setState({picResults:body.photos.photo})
+          this.setState({picResults: body.photos.photo});
       })
-      .catch (function (error) {
+      .catch(function (error) {
         console.log('request failed', error);
       });
   }
 
   render () {
-    const { picRequest, picResults } = this.state;
-
+    const { picRequest, picResults, picView } = this.state;
+    var selectedTab = picView.selectedTab;
+// debugger;
     return (
-      <div>
+      <div id="page-wrap">
         <Appbar
-          style={{textAlign: 'center', fontSize: '30px', padding: '10px 0px', backgroundColor: 'black'}}
+          style={{textAlign: 'center', fontSize: '40px', padding: '10px 0px', backgroundColor: 'transparent', color: '#2196F3'}}
           className="mui--appbar-height"
             >NASA-Graphy
         </Appbar>
-        <Container style={{maxWidth: '600px', marginTop: '30px'}}>
-          <Panel>
-            <div className="mui--text-center">
-              <Input type="text"
-                label='Search NASA Pics by "tag"'
-                floatingLabel={true}
-                required={true}
-                value={picRequest.tag}
-                onChange={(e) => this.handleUpdate(e.target.value)}
-                />
-              <Button
-                variant="raised"
-                type="submit"
-                onClick={e => this.handleSearchSubmit(e)}>Send
-              </Button>
-            </div>
-          </Panel>
-        </Container>
-        <PicResults picResults={picResults}/>
-      </div>)
+        <Tabs onSelect={this.onTabChange} initialSelectedIndex={0}
+         value={this.state.picView.selectedTab} justified={true} style={{marginTop: '50px'}}>
+          <Tab
+            className="tab1"
+            value="pane-1"
+            label="Search Tab"
+            onActive={this.onActive}>
+            <Container style={{maxWidth: '600px', marginTop: '30px'}}>
+              <Panel style={{background: 'rgba(255, 255, 255, .1)', border: 'solid 2px #2196F3'}}>
+                <div
+                  className="mui--text-center"
+                  style={{backgroundColor: 'transparent'}}>
+                  <Input type="text"
+                    label='Search NASA Pics by "tag"'
+                    floatingLabel={true}
+                    required={true}
+                    value={picRequest.tag}
+                    style={{color: '#999', borderBottom: '#2196F3 solid 2px'}}
+                    onChange={(e) => this.handleUpdate(e.target.value)}
+                    />
+                  <Button
+                    className="mui-btn--primary"
+                    variant="raised"
+                    type="submit"
+                    onClick={e => this.handleSearchSubmit(e)}>Search
+                  </Button>
+                </div>
+              </Panel>
+            </Container>
+            <PicResults picResults={picResults} handlePicView={this.handlePicView}/>
+          </Tab>
+          <Tab className="tab2" value="pane-2" label="View Selected Pic">
+            <PicView pic={picView}/>
+          </Tab>
+        </Tabs>
+      </div>);
     }
   }
 
