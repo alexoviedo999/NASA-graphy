@@ -3,7 +3,7 @@ import { Container, Panel, Button, Row, Col } from 'muicss/react';
 
 let PicResults = (props) => {
   const {picResults, handlePicView} = props;
-// debugger;
+
   return (
     <div>
       <Container style={{marginTop: '30px'}}>

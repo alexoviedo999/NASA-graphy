@@ -4,16 +4,15 @@ import { Container, Panel } from 'muicss/react';
 let PicView = (props) => {
   const {pic} = props;
 
-  console.log('picviewProps', props);
   return (
     <div>
       <Container>
         <Panel
           className={pic.pic.id ? 'showPanel' : 'hidePanel'}
-          style={{position: 'relative', backgroundColor: 'transparent', border: '2px solid #2196F3', padding: '15px 25px'}}>
-          <h2>{pic.pic.title}</h2>
+          style={{position: 'relative', backgroundColor: 'transparent'}}>
+          <h2 style={{textAlign: 'center'}}>{pic.pic.title}</h2>
           <img
-            style={{margin: '10px'}}
+            style={{width: '80%', padding: '15px', display: 'block', margin: '0 auto'}}
             src={'https://farm' + pic.pic.farm + '.staticflickr.com/' + pic.pic.server + '/' + pic.pic.id + '_' + pic.pic.secret + '_b' + '.jpg'} />
         </Panel>
         <Panel

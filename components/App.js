@@ -1,20 +1,17 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import {
   Appbar,
   Input,
   Button,
   Container,
-  Panel
+  Panel,
+  Form
 } from 'muicss/react';
-import Tabs from 'muicss/lib/react/tabs';
-import Tab from 'muicss/lib/react/tab';
 import PicResults from './picResults';
 import PicView from './PicView';
-import { browserHistory } from 'react-router';
 
 class App extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
 
     this.state = {
@@ -23,18 +20,16 @@ class App extends Component {
       },
       picResults: [],
       picView: {
-        pic: '',
-        selectedTab: 0
+        pic: ''
       },
-      selectedTab: 0
-    }
+      toggleView: 0,
+      resultStatus: true
+    };
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handlePicView = this.handlePicView.bind(this);
-    this.onTabChange = this.onTabChange.bind(this);
   }
 
   handleUpdate (value) {
-    //set student state
     this.setState({
       picRequest: {
         ...this.state.picRequest,
@@ -43,35 +38,27 @@ class App extends Component {
     });
   }
 
-  onTabChange (i, value, tab, ev) {
-    console.log('tabs', arguments);
-// debugger;
-    console.log('select', this.state.picView.selectedTab);
-    this.setState({
-      picView: {
-        ...this.state.picView,
-        selectedTab: 1
-      }
-    });
-  }
-
   handlePicView (pic) {
-    // debugger;
     console.log('picView', pic);
     this.setState({
       picView: {
         ...this.state.picView,
-        pic: pic,
-        selectedTab: 1
-      }
+        pic: pic
+      },
+      toggleView: 1
+    });
+  }
+
+  handleSearchView (pic) {
+    console.log('picView', pic);
+    this.setState({
+      toggleView: 0
     });
   }
 
   handleSearchSubmit (e) {
     e.preventDefault();
     const { picRequest } = this.state;
-// debugger;
-
     const fetchResult = fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=3cfc5214b8dce09b084ad6ba57799de2&user_id=24662369@N07&tags=' + picRequest.tags + '&per_page=12&sort=relevance&format=json&nojsoncallback=1')
       .then(function (response) {
           console.log('response', response);
@@ -79,7 +66,12 @@ class App extends Component {
       })
       .then((body) => {
           console.log('success', body.photos.photo);
-          this.setState({picResults: body.photos.photo});
+          let resultStatus = body.photos.photo.length ? true : false;
+          this.setState({
+            picResults: body.photos.photo,
+            toggleView: 0,
+            resultStatus: resultStatus
+          });
       })
       .catch(function (error) {
         console.log('request failed', error);
@@ -87,30 +79,44 @@ class App extends Component {
   }
 
   render () {
-    const { picRequest, picResults, picView } = this.state;
-    var selectedTab = picView.selectedTab;
-// debugger;
+    const {
+      picRequest,
+      picResults,
+      picView,
+      toggleView,
+      resultStatus
+    } = this.state;
+    let contents;
+
+    // Conditional for managing pic results vs. single pic view vs. no results
+    if (toggleView) {
+      contents = <div>
+        <a onClick={e => this.handleSearchView(e)} style={{fontSize: '16px', display: 'block', textAlign: 'center'}}>Return to results</a>
+        <PicView pic={picView} />
+      </div>;
+    } else {
+      if (resultStatus) {
+        contents = <PicResults picResults={picResults} handlePicView={this.handlePicView} />;
+      } else {
+        contents = <h3 style={{textAlign: 'center'}}>No results, please search again.</h3>;
+      }
+    }
+
     return (
       <div id="page-wrap">
         <Appbar
-          style={{textAlign: 'center', fontSize: '40px', padding: '10px 0px', backgroundColor: 'transparent', color: '#2196F3'}}
-          className="mui--appbar-height"
-            >NASA-Graphy
+          style={{textAlign: 'center', fontSize: '44px', fontWeight: 'bold', padding: '10px 0px', backgroundColor: 'transparent', color: '#2196F3'}}
+          className="mui--appbar-height">
+          NASA-Graphy
         </Appbar>
-        <Tabs onSelect={this.onTabChange} initialSelectedIndex={0}
-         value={this.state.picView.selectedTab} justified={true} style={{marginTop: '50px'}}>
-          <Tab
-            className="tab1"
-            value="pane-1"
-            label="Search Tab"
-            onActive={this.onActive}>
-            <Container style={{maxWidth: '600px', marginTop: '30px'}}>
-              <Panel style={{background: 'rgba(255, 255, 255, .1)', border: 'solid 2px #2196F3'}}>
-                <div
-                  className="mui--text-center"
-                  style={{backgroundColor: 'transparent'}}>
+          <Container style={{maxWidth: '600px', marginTop: '30px'}}>
+            <Panel style={{background: 'rgba(255, 255, 255, .1)', border: 'solid 2px #2196F3'}}>
+              <div
+                className="mui--text-center"
+                style={{backgroundColor: 'transparent'}}>
+                <Form>
                   <Input type="text"
-                    label='Search NASA Pics by "tag"'
+                    label='Search NASA flickr Pics by "tag"'
                     floatingLabel={true}
                     required={true}
                     value={picRequest.tag}
@@ -123,19 +129,13 @@ class App extends Component {
                     type="submit"
                     onClick={e => this.handleSearchSubmit(e)}>Search
                   </Button>
-                </div>
-              </Panel>
-            </Container>
-            <PicResults picResults={picResults} handlePicView={this.handlePicView}/>
-          </Tab>
-          <Tab className="tab2" value="pane-2" label="View Selected Pic">
-            <PicView pic={picView}/>
-          </Tab>
-        </Tabs>
+                </Form>
+              </div>
+            </Panel>
+          </Container>
+          {contents}
       </div>);
     }
   }
 
-
-export
-default App;
+export default App;
